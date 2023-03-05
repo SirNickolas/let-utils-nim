@@ -50,9 +50,9 @@ test "`asVar` without UFCS works":
 
 test "`viaVar` works":
   #[
-    Declaring identifiers in a statement-list expression that yields a `typedesc` is quirky.
-    It differs across Nim versions and can produce errors in the generated C code (even though
-    type-checking succeeds) so we don't test it. Please don't do that either.
+    Declaring identifiers in a compile-time-evaluated statement-list expression is quirky.
+    The result differs across Nim versions and can produce errors in the generated C code (even
+    though type-checking succeeds) so we don't test it. Please don't do that either.
   ]#
   let a = seq[string].viaVar b:
     b &= "msg"
@@ -68,3 +68,18 @@ test "`viaVar` without UFCS works":
     check b == ["msg"]
   check a == ["msg"]
   check: not declared b
+
+test "`freezeVars` works":
+  freezeVars:
+    var fib = @[0, 1]
+    for i in 2 ..< 13:
+      fib &= fib[^1] + fib[^2]
+
+  check fib == [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144]
+  check: not compiles((fib[0] = 123))
+
+test "`freezeVars` can handle absence of variables":
+  var ok = false
+  freezeVars:
+    ok = true
+  check ok
