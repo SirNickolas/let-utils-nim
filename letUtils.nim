@@ -2,6 +2,8 @@
 ## as much as practical.
 
 import std/macros
+when (NimMajor, NimMinor) >= (1, 2):
+  import std/with
 
 func unreachable {.noReturn, inline.} = discard
 
@@ -21,12 +23,12 @@ template scope*(body: untyped): auto =
   else:
     unreachable()
 
-template asLet*(value, name, body: untyped): auto =
+template asLet*(val, name, body: untyped): auto =
   ##[
     Equivalent to:
 
     .. code-block:: nim
-      let name = value
+      let name = val
       body
       name
 
@@ -38,16 +40,45 @@ template asLet*(value, name, body: untyped): auto =
           obj.field = 1
   ]##
   scope:
-    let name = value
+    let name = val
     body
     name
 
-template asVar*(value, name, body: untyped): auto =
+when declared with:
+  template asLet*(val, body: untyped): auto =
+    ##[
+      Equivalent to:
+
+      .. code-block:: nim
+        let tmp = val
+        with tmp:
+          body
+        tmp
+
+      **Example:**
+
+      .. code-block:: nim
+        processObj:
+          getObj().asLet:
+            field = 1
+
+      **Since:** Nim 1.2.
+
+      **See also:**
+      * `std/with <https://nim-lang.org/docs/with.html>`_
+    ]##
+    scope:
+      let tmp = val
+      with tmp:
+        body
+      tmp
+
+template asVar*(val, name, body: untyped): auto =
   ##[
     Equivalent to:
 
     .. code-block:: nim
-      var name = value
+      var name = val
       body
       name
 
@@ -61,9 +92,36 @@ template asVar*(value, name, body: untyped): auto =
           s.strip
   ]##
   scope:
-    var name = value
+    var name = val
     body
     name
+
+when declared with:
+  template asVar*(val, body: untyped): auto =
+    ##[
+      Equivalent to:
+
+      .. code-block:: nim
+        var tmp = val
+        with tmp:
+          body
+        tmp
+    ]##
+    runnableExamples:
+      from std/strbasics import strip
+
+      assert " test\n".asVar(strip) == "test"
+    ##[
+      **Since:** Nim 1.2.
+
+      **See also:**
+      * `std/with <https://nim-lang.org/docs/with.html>`_
+    ]##
+    scope:
+      var tmp = val
+      with tmp:
+        body
+      tmp
 
 template viaVar*[T](t: typedesc[T]; name, body: untyped): T =
   ##[
@@ -90,6 +148,37 @@ template viaVar*[T](t: typedesc[T]; name, body: untyped): T =
     var name: T
     body
     name
+
+when declared with:
+  template viaVar*[T](t: typedesc[T]; body: untyped): T =
+    ##[
+      Equivalent to:
+
+      .. code-block:: nim
+        var tmp: T
+        with tmp:
+          body
+        tmp
+
+      **Example:**
+
+      .. code-block:: nim
+        run:
+          Config.viaVar:
+            logFile = "prog.log"
+            verbosity = 1
+            merge loadFromFile "config.kdl"
+
+      **Since:** Nim 1.2.
+
+      **See also:**
+      * `std/with <https://nim-lang.org/docs/with.html>`_
+    ]##
+    scope:
+      var tmp: T
+      with tmp:
+        body
+      tmp
 
 macro freezeVars*(body: untyped): auto =
   ## Create a `let` binding for each top-level `var` in `body`; make other declarations inaccessible
