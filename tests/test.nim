@@ -10,6 +10,17 @@ test "`scope` works":
     check a == 1
   check: not declared a
 
+test "`scope` works at compile-time":
+  func triggerCompilerBug: seq[int] =
+    result.add:
+      scope:
+        discard # Essential for the test.
+        0x29A8CC57 # Just a random number.
+
+  static:
+    doAssert triggerCompilerBug() == [0x29A8CC57]
+  check triggerCompilerBug() == [0x29A8CC57]
+
 test "`asLet` works":
   let a = (let b = 1; b).asLet c:
     check: not declared a

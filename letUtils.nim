@@ -21,6 +21,7 @@ template scope*(body: untyped): auto =
   if true:
     body
   else:
+    discard # Required to work around a bug in the compiler.
     unreachable()
 
 template asLet*(val, name, body: untyped): auto =
