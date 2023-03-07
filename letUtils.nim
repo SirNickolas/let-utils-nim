@@ -7,7 +7,7 @@ when (NimMajor, NimMinor) >= (1, 2):
 
 func unreachable {.noReturn, inline.} = discard
 
-template scope*(body: untyped): auto =
+template scope*(body: untyped): untyped =
   ##[
     Open a new lexical scope (variables declared in the body are not accessible outside). Similar
     to the built-in `block` `language construct`_ but does not interfere with `break`. All credits
@@ -24,7 +24,7 @@ template scope*(body: untyped): auto =
     discard # Required to work around a bug in the compiler.
     unreachable()
 
-template asLet*(val, name, body: untyped): auto =
+template asLet*(val, name, body: untyped): untyped =
   ##[
     Equivalent to:
 
@@ -46,7 +46,7 @@ template asLet*(val, name, body: untyped): auto =
     name
 
 when declared with:
-  template asLet*(val, body: untyped): auto =
+  template asLet*(val, body: untyped): untyped =
     ##[
       Equivalent to:
 
@@ -74,7 +74,7 @@ when declared with:
         body
       tmp
 
-template asVar*(val, name, body: untyped): auto =
+template asVar*(val, name, body: untyped): untyped =
   ##[
     Equivalent to:
 
@@ -98,7 +98,7 @@ template asVar*(val, name, body: untyped): auto =
     name
 
 when declared with:
-  template asVar*(val, body: untyped): auto =
+  template asVar*(val, body: untyped): untyped =
     ##[
       Equivalent to:
 
@@ -181,7 +181,7 @@ when declared with:
         body
       tmp
 
-macro freezeVars*(body: untyped): auto =
+macro freezeVars*(body: untyped): untyped =
   ## Create a `let` binding for each top-level `var` in `body`; make other declarations inaccessible
   ## from outside.
   runnableExamples:
