@@ -124,7 +124,7 @@ when declared with:
         body
       tmp
 
-template viaVar*[T](t: typedesc[T]; name, body: untyped): T =
+template viaVar*[T](t: type[T]; name, body: untyped): T =
   ##[
     Equivalent to:
 
@@ -151,7 +151,7 @@ template viaVar*[T](t: typedesc[T]; name, body: untyped): T =
     name
 
 when declared with:
-  template viaVar*[T](t: typedesc[T]; body: untyped): T =
+  template viaVar*[T](t: type[T]; body: untyped): T =
     ##[
       Equivalent to:
 
