@@ -25,7 +25,13 @@ jobs:
   nim:
     strategy:
       matrix:
-        nim-version: [0.19.x, 0.20.x, 1.0.x, 1.2.x, 1.4.x, 1.6.x]
+        nim-version:
+          # - 0.19.x # `choosenim` compiled with Nim 1.6.14 fails mysteriously on it.
+          - 0.20.x
+          - 1.0.x
+          - 1.2.x
+          - 1.4.x
+          - 1.6.x
     name: Test on ${{ matrix.nim-version }}
     runs-on: ubuntu-latest
 
@@ -58,9 +64,9 @@ jobs:
         if [[ ${{ matrix.nim-version }} < 1.4 ]]; then
           flags=()
         else
-          flags=(--hint[MsgOrigin]=off)
+          flags=(--hint=MsgOrigin:off)
         fi
-        nimble -y --verbose test --verbosity=2 --hint[GlobalVar]=off "${flags[@]}"
+        nimble -y --verbose test --verbosity=2 --hint=GlobalVar:off "${flags[@]}"
 
     - name: Generate API docs
       if: matrix.nim-version == '1.6.x'
