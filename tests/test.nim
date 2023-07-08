@@ -12,10 +12,9 @@ test "`scope` works":
 
 test "`scope` works at compile-time":
   func triggerCompilerBug: seq[int] =
-    result.add:
-      scope:
-        discard # Essential for the test.
-        0x29A8CC57 # Just a random number.
+    result.add scope do:
+      discard # Essential for the test.
+      0x29A8CC57 # Just a random number.
 
   static:
     doAssert triggerCompilerBug() == [0x29A8CC57]
@@ -137,3 +136,12 @@ test "`freezeVars` can handle absence of variables":
   freezeVars:
     ok = true
   check ok
+
+test "`freezeVars` can handle multiple variables":
+  freezeVars:
+    var (a, b) = (1, 2)
+    var c, d = 3
+  check a == 1
+  check b == 2
+  check c == 3
+  check d == 3
