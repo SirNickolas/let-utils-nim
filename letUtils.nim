@@ -1,4 +1,4 @@
-## A collection of small templates and macros that aid in limiting the scope of mutable `var`iables
+## A collection of small templates and macros that aid in limiting the scope of mutable `var`\iables
 ## as much as practical.
 
 import std/macros
@@ -107,12 +107,14 @@ when declared with:
         with tmp:
           body
         tmp
-    ]##
-    runnableExamples:
-      from std/strbasics import strip
 
-      assert " test\n".asVar(strip) == "test"
-    ##[
+      **Example:**
+
+      .. code-block:: nim
+        from std/strbasics import strip
+
+        assert " test\n".asVar(strip) == "test"
+
       **Since:** Nim 1.2.
 
       **See also:**
@@ -182,17 +184,21 @@ when declared with:
       tmp
 
 macro freezeVars*(body: untyped): untyped =
-  ## Create a `let` binding for each top-level `var` in `body`; make other declarations inaccessible
-  ## from outside.
-  runnableExamples:
-    freezeVars:
-      var fib = @[0, 1]
-      for i in 2 ..< 13:
-        fib &= fib[^1] + fib[^2]
-    # From now on, you cannot modify `fib`.
-    echo fib
-    assert not compiles (fib[0] = 123)
   ##[
+    Create a `let` binding for each top-level `var` in `body`; make other declarations inaccessible
+    from outside.
+
+    **Example:**
+
+    .. code-block:: nim
+      freezeVars:
+        var fib = @[0, 1]
+        for i in 2 ..< 13:
+          fib &= fib[^1] + fib[^2]
+      # From now on, you cannot modify `fib`.
+      echo fib
+      assert not compiles (fib[0] = 123)
+
     **Example:**
 
     .. code-block:: nim
